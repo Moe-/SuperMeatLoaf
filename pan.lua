@@ -27,7 +27,7 @@ end
 	
 function Pan:loadGfx()	
 	self.imgTile = love.graphics.newImage("gfx/tilemap.png")
-	self.quadTile = love.graphics.newQuad(2 * gTileSize, 0 * gTileSize, gTileSize, gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
+	self.quadTile = love.graphics.newQuad(2 * gTileSize, 0 * gTileSize, 2 * gTileSize, gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
 end
 
 function Pan:draw(offsetX, offsetY)
