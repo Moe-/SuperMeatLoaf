@@ -1,25 +1,82 @@
+require("tileloader")
+require("broccoli")
+require("player")
+
+
 class "World" {
 	screenWidth = 0;
 	screenHeight = 0;
 }
 
+gTileSize = 64
+
 function World:__init(width, height)
 	self.screenWidth = width;
 	self.screenHeight = height;
+	
+	--self.tiles, self.layers = TiledMap_Parse("maps/level01.tmx")
+	--TiledMap_Load("maps/level01.tmx")
+	local file = love.filesystem.read("maps/level01.tmx")
+	local start = string.find(file, "<data encoding=\"csv\">") + 21
+	local endPos = string.find(file, "</data>") - 1
+	local data = file:sub(start, endPos)
+	--print(data)
+	self.level = {}
+	self.width = 20
+	self.height = 15
+	for word in string.gmatch(data, "%d+") do 
+		table.insert(self.level, tonumber(word)) 
+	end
+	print(self.width, self.height, #self.level)
+	
+	self:loadGfx()
+	
+	for y = 0, self.height - 1 do
+		for x = 0, self.width - 1 do
+			local id = self.level[y * self.width + x + 1]
+			if id == 1 then
+				self.player = Player:new(x * gTileSize, y * gTileSize)
+				self.level[y * self.width + x + 1] = 0
+			elseif id == 2 then
+				self.broccoli = Broccoli:new(x * gTileSize, y * gTileSize)
+				self.level[y * self.width + x + 1] = 0
+			end
+		end
+	end
 end
 
 function World:update(dt)
-	
+	self.player:update(dt, self.level, self.width, self.height, self.broccoli)
+	self.broccoli:update(dt)
 end
 
 function World:loadGfx()	
-	self.imgHuman = love.graphics.newImage("gfx/human.png")
-	self.quadHuman = love.graphics.newQuad(0, 0, self.imgHuman:getWidth(), self.imgHuman:getHeight(), self.imgHuman:getWidth(), self.imgHuman:getHeight())
+	self.imgTile = love.graphics.newImage("gfx/tilemap.png")
+	self.quadTile = love.graphics.newQuad(0, 0, self.imgTile:getWidth(), self.imgTile:getHeight(), self.imgTile:getWidth(), self.imgTile:getHeight())
 end
 
 function World:draw()
 	love.graphics.setColor(255, 255, 255)
-	love.graphics.print('Hello World!', 400, 300)
+	--love.graphics.print('Hello World!', 400, 300)
+	
+	local offsetX = 10 * gTileSize
+	local offsetY = 1 * gTileSize
+	
+	for y = 0, self.height - 1 do
+		for x = 0, self.width - 1 do
+			local id = self.level[x + 1 + y * self.width]
+			if id > 0 then
+				local srcX = (id - 1) % 4
+				local srcY = math.floor((id - 1) / 4)
+				local quad = love.graphics.newQuad(srcX * gTileSize, srcY * gTileSize, gTileSize, gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
+				love.graphics.draw(self.imgTile, quad, (x + 10) * gTileSize, (y+1) * gTileSize)
+				--print(srcX * gTileSize, srcY * gTileSize, gTileSize, gTileSize, "=>", (x + 11) * gTileSize, y * gTileSize)
+			end
+		end
+	end
+	
+	self.player:draw(offsetX, offsetY)
+	self.broccoli:draw(offsetX, offsetY)
 --	love.graphics.draw(self.background)
 end
 
@@ -27,6 +84,7 @@ function World:keyreleased(key)
 --	for i, v in pairs(self.players) do
 --		v:keyreleased(key)
 --	end
+	self.player:keyreleased(key)
 end
 
 function World:keypressed(key, scancode, isrepeat)
@@ -34,4 +92,5 @@ function World:keypressed(key, scancode, isrepeat)
 --	for i, v in pairs(self.players) do
 --		v:keypressed(key, scancode, isrepeat)
 --	end
+	self.player:keypressed(key, scancode, isrepeat)
 end

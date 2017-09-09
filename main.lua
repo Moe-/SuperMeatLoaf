@@ -1,6 +1,5 @@
 require("utils")
 require("world")
-require("tileloader.lua")
 
 gWorld = nil
 
