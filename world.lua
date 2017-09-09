@@ -143,10 +143,10 @@ function World:draw()
 		end
 	end
 	
+	self.oven:draw(offsetX, offsetY)
 	self.player:draw(offsetX, offsetY, self.screenWidth, self.screenHeight)
 	self.broccoli:draw(offsetX, offsetY)
 	self.pan:draw(offsetX, offsetY)
-	self.oven:draw(offsetX, offsetY)
 	
 	for i, v in pairs(self.items) do
 		v:draw(offsetX, offsetY)

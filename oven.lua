@@ -16,11 +16,11 @@ end
 	
 function Oven:loadGfx()	
 	self.imgTile = love.graphics.newImage("gfx/tilemap.png")
-	self.quadTile = love.graphics.newQuad(0 * gTileSize, 4 * gTileSize, gTileSize, gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
+	self.quadTile = love.graphics.newQuad(0 * gTileSize, 3 * gTileSize, 2 * gTileSize, 2 * gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
 end
 
 function Oven:draw(offsetX, offsetY)
-	love.graphics.draw(self.imgTile, self.quadTile, self.posX + offsetX, self.posY + offsetY)
+	love.graphics.draw(self.imgTile, self.quadTile, self.posX + offsetX - gTileSize, self.posY + offsetY - gTileSize)
 end
 
 function Oven:keyreleased(key)
