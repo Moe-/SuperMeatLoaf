@@ -15,13 +15,18 @@ class "World" {
 gTileSize = 64
 
 gLevelsets = {
---  file, width, height, meat, salt, onion, spice
-		{"maps/level01.tmx", 20, 15, 4, 4, 4, 4}
+--  file, width, height
+		{"maps/level01.tmx", 20, 15},
+		{"maps/level02.tmx", 20, 15}
 }
 
 function World:__init(width, height, level)
 	self.screenWidth = width;
 	self.screenHeight = height;
+	if level > #gLevelsets then
+		level = #gLevelsets
+	end
+	self.levelId = level
 	
 	--self.tiles, self.layers = TiledMap_Parse("maps/level01.tmx")
 	--TiledMap_Load("maps/level01.tmx")
@@ -41,26 +46,37 @@ function World:__init(width, height, level)
 	self:loadGfx()
 	
 	self.items = {}
+	local salt = 0
+	local spice = 0
+	local meat = 0
+	local onion = 0
+	local playerPosX = 0
+	local playerPosY = 0
 	for y = 0, self.height - 1 do
 		for x = 0, self.width - 1 do
 			local id = self.level[y * self.width + x + 1]
 			if id == 1 then
-				self.player = Player:new(x * gTileSize, y * gTileSize, gLevelsets[level][4], gLevelsets[level][5], gLevelsets[level][6], gLevelsets[level][7])
+				playerPosX = x * gTileSize
+				playerPosY = y * gTileSize
 				self.level[y * self.width + x + 1] = 0
 			elseif id == 2 then
 				self.broccoli = Broccoli:new(x * gTileSize, y * gTileSize)
 				self.level[y * self.width + x + 1] = 0
 			elseif id == 9 then
 				table.insert(self.items, Item:new(x * gTileSize, y * gTileSize, "salt")) 
+				salt = salt + 1
 				self.level[y * self.width + x + 1] = 0
 			elseif id == 10 then
 				table.insert(self.items, Item:new(x * gTileSize, y * gTileSize, "spice")) 
+				spice = spice + 1
 				self.level[y * self.width + x + 1] = 0
 			elseif id == 11 then
 				table.insert(self.items, Item:new(x * gTileSize, y * gTileSize, "meat")) 
+				meat = meat + 1
 				self.level[y * self.width + x + 1] = 0
 			elseif id == 12 then
 				table.insert(self.items, Item:new(x * gTileSize, y * gTileSize, "onion")) 
+				onion = onion + 1
 				self.level[y * self.width + x + 1] = 0
 			elseif id == 3 then
 				self.pan = Pan:new(x * gTileSize, y * gTileSize) 
@@ -71,6 +87,7 @@ function World:__init(width, height, level)
 			end
 		end
 	end
+	self.player = Player:new(playerPosX, playerPosY, meat, salt, onion, spice)
 	
 	self.gameState = "alive"
 	self.first = true
@@ -81,8 +98,13 @@ function World:update(dt)
 		self.first = false
 		return
 	end
+	local oldState = self.gameState
 	self.gameState = self.player:update(dt, self.level, self.width, self.height, self.broccoli, self.items, self.pan, self.gameState)
-		
+	
+	if oldState == "alive" and self.gameState == "won" then
+		self.levelId = self.levelId + 1
+	end
+	
 	self.broccoli:update(dt)
 	self.pan:update(dt, self.oven)
 end
@@ -157,4 +179,8 @@ function World:keypressed(key, scancode, isrepeat)
 --		v:keypressed(key, scancode, isrepeat)
 --	end
 	self.player:keypressed(key, scancode, isrepeat)
+end
+
+function World:getNextLevel()
+	return self.levelId
 end

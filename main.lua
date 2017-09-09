@@ -2,9 +2,10 @@ require("utils")
 require("world")
 
 gWorld = nil
+gNextLevel = 1
 
 function init()
-	gWorld = World:new(1920,1080, 1)	
+	gWorld = World:new(1920,1080, gNextLevel)	
 	math.randomseed(4)
 end
 
@@ -24,6 +25,9 @@ function love.keypressed(key, scancode, isrepeat)
     if key == "escape" then
         love.event.quit()
     elseif key == "t" then
+			if gWorld ~= nil then
+				gNextLevel = gWorld:getNextLevel()
+			end
 			init()
 		elseif key == "f4" then
 			local screenshot = love.graphics.newScreenshot();

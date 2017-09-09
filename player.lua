@@ -90,7 +90,7 @@ function Player:update(dt, level, width, height, broccoli, items, pan, gameState
 		self.speedY = 0
 	end
 	
-	self.posX = self.posX + self.speedX * dt
+	self.posX = self.posX + 2 * self.speedX * dt
 	self.posY = self.posY + self.speedY * dt
 	
 	if self.posX < 0 then self.posX = 0 end
@@ -161,6 +161,7 @@ function Player:draw(offsetX, offsetY, screenWidth, screenHeight)
 	end
 	
 	local scale = (self.meat + self.meatTarget) / (2 * self.meatTarget)
+	local offset = (scale - 0.5) * gTileSize;
 	local quadTile = love.graphics.newQuad(self.animFrame * 2 * gTileSize, yGfx * 2 * gTileSize, 2 * gTileSize, 2 * gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
 	love.graphics.draw(self.imgTile, quadTile, self.posX + offsetX, self.posY + offsetY, 0, scale, scale)
 	
