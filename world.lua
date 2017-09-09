@@ -20,6 +20,8 @@ gLevelsets = {
 		{"maps/level02.tmx", 20, 15}
 }
 
+gBackgroundMusic = love.audio.newSource("sfx/background.ogg")-- => https://freesound.org/s/377873/
+
 function World:__init(width, height, level)
 	self.screenWidth = width;
 	self.screenHeight = height;
@@ -27,6 +29,8 @@ function World:__init(width, height, level)
 		level = #gLevelsets
 	end
 	self.levelId = level
+	
+	love.audio.play(gBackgroundMusic)
 	
 	--self.tiles, self.layers = TiledMap_Parse("maps/level01.tmx")
 	--TiledMap_Load("maps/level01.tmx")
