@@ -8,6 +8,8 @@ class "Player" {
 
 gPlayerSpeed = 128
 
+gMeatHit = love.audio.newSource("sfx/meat_hit.wav")
+
 function Player:__init(posX, posY, meat, salt, onion, spice)
 	self.posX = posX
 	self.posY = posY
@@ -88,6 +90,7 @@ function Player:update(dt, level, width, height, broccoli, items, pan, gameState
 		self.speedY = 0
 	elseif ((checkTile >= 5 and checkTile <= 8) or checkTile >= 25) and self.speedY > 0 then
 		self.touchFloor = true
+		love.audio.play(gMeatHit)
 		self.speedY = 0
 	end
 	
