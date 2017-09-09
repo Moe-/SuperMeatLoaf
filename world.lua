@@ -116,10 +116,15 @@ end
 function World:loadGfx()	
 	self.imgTile = love.graphics.newImage("gfx/tilemap.png")
 	self.quadTile = love.graphics.newQuad(0, 0, self.imgTile:getWidth(), self.imgTile:getHeight(), self.imgTile:getWidth(), self.imgTile:getHeight())
+	
+	self.imgBackground = love.graphics.newImage("gfx/bg.png")
+	self.quadBackground = love.graphics.newQuad(0, 0, self.imgBackground:getWidth(), self.imgBackground:getHeight(), self.imgBackground:getWidth(), self.imgBackground:getHeight())
 end
 
 function World:draw()
 	love.graphics.setColor(255, 255, 255)
+	
+	love.graphics.draw(self.imgBackground, self.quadBackground, 0, 0)
 	--love.graphics.print('Hello World!', 400, 300)
 	
 	local offsetX = 10 * gTileSize
