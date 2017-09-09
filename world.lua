@@ -73,9 +73,14 @@ function World:__init(width, height, level)
 	end
 	
 	self.gameState = "alive"
+	self.first = true
 end
 
 function World:update(dt)
+	if self.first then
+		self.first = false
+		return
+	end
 	self.gameState = self.player:update(dt, self.level, self.width, self.height, self.broccoli, self.items, self.pan, self.gameState)
 		
 	self.broccoli:update(dt)

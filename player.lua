@@ -49,7 +49,17 @@ function Player:update(dt, level, width, height, broccoli, items, pan, gameState
 	end
 	
 	--if self.speedY ~= 0 or self.speedY > gPlayerSpeed then
-		self.speedY = self.speedY + 2 * dt * gPlayerSpeed
+	local factor = 1
+	if self.speedY > gPlayerSpeed/2 then
+		factor = 6
+	elseif self.speedY > 0 then
+		factor = 4
+	elseif self.speedY > -gPlayerSpeed then
+		factor = 2
+	else
+		factor = 1
+	end
+		self.speedY = self.speedY + 2 * dt * gPlayerSpeed * factor
 	--end
 	
 	local checkX = self.posX
@@ -64,14 +74,18 @@ function Player:update(dt, level, width, height, broccoli, items, pan, gameState
 		self.speedX = -self.speedX
 	end
 	
-	checkX = self.posX
-	checkY = self.posY + self.size/2
-	checkTile = level[math.floor(checkX / gTileSize) + math.floor(checkY / gTileSize) * width + 1]
-	
-		--self.testoutput = checkX .. " " .. checkY .. " => " .. math.floor(checkX / gTileSize) .. " " .. math.floor(checkY / gTileSize) .. " => " .. (math.floor(checkX / gTileSize) + math.floor(checkY / gTileSize) * width + 1) .. " " .. checkTile
-	
 	self.touchFloor = false
-	if ((checkTile >= 5 and checkTile <= 8) or checkTile >= 25) and self.speedY > 0 then
+	checkX = self.posX
+	checkY = self.posY
+	if self.speedY >= 0 then
+		checkY = checkY + self.size
+	else
+		checkY = checkY - self.size
+	end
+	checkTile = level[math.floor(checkX / gTileSize) + math.floor(checkY / gTileSize) * width + 1]	
+	if checkTile == nil then
+		self.speedY = 0
+	elseif ((checkTile >= 5 and checkTile <= 8) or checkTile >= 25) and self.speedY > 0 then
 		self.touchFloor = true
 		self.speedY = 0
 	end
@@ -140,6 +154,12 @@ function Player:draw(offsetX, offsetY, screenWidth, screenHeight)
 	if self.speedX < 0 then
 		yGfx = yGfx + 1
 	end
+	
+	if self.inPan then
+		yGfx = 0
+		self.animFrame = 0
+	end
+	
 	local scale = (self.meat + self.meatTarget) / (2 * self.meatTarget)
 	local quadTile = love.graphics.newQuad(self.animFrame * 2 * gTileSize, yGfx * 2 * gTileSize, 2 * gTileSize, 2 * gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
 	love.graphics.draw(self.imgTile, quadTile, self.posX + offsetX, self.posY + offsetY, 0, scale, scale)
