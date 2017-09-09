@@ -1,12 +1,7 @@
 class "Broccoli" {
 	posX = 0;
 	posY = 0;
-	
-	speedX = 0;
-	speedY = 0;
 }
-
-gPlayerSpeed = 128
 
 function Broccoli:__init(posX, posY)
 	self.posX = posX

@@ -8,12 +8,22 @@ class "Player" {
 
 gPlayerSpeed = 128
 
-function Player:__init(posX, posY)
+function Player:__init(posX, posY, meat, salt, onion, spice)
 	self.posX = posX
 	self.posY = posY
 	
 	self.speedX = 0
 	self.speedY = 0
+	
+	self.meatTarget = meat
+	self.saltTarget = salt
+	self.onionTarget = onion
+	self.spiceTarget = spice
+	
+	self.meat = 0
+	self.salt = 0
+	self.onion = 0
+	self.spice = 0
 	
 	self.size = gTileSize
 	
@@ -25,7 +35,7 @@ function Player:__init(posX, posY)
 	self:loadGfx()
 end
 
-function Player:update(dt, level, width, height, broccoli)
+function Player:update(dt, level, width, height, broccoli, items)
 	--if self.speedY ~= 0 or self.speedY > gPlayerSpeed then
 		self.speedY = self.speedY + 2 * dt * gPlayerSpeed
 	--end
@@ -64,6 +74,25 @@ function Player:update(dt, level, width, height, broccoli)
 	
 	broccoli:addPos(self.posX, self.posY)
 	
+	for i, v in pairs(items) do
+		local itemX, itemY = v:getPos()
+		local distance = getDistance(self.posX, self.posY, itemX, itemY)
+		if distance < gTileSize / 2 then
+			local iType = v:getType()
+			if iType == "salt" then
+				self.salt = self.salt + 1
+			elseif iType == "spice" then
+				self.spice = self.spice + 1
+			elseif iType == "meat" then
+				self.meat = self.meat + 1
+			elseif iType == "onion" then
+				self.onion = self.onion + 1
+			end
+			table.remove(items, i)
+		end
+	end
+	
+	
 	local brocX, brocY = broccoli:getPos()
 	local distance = getDistance(self.posX, self.posY, brocX, brocY)
 	if distance < gTileSize / 2 then
@@ -80,10 +109,16 @@ function Player:loadGfx()
 	self.quadTile = love.graphics.newQuad(0 * gTileSize, 0 * gTileSize, gTileSize, gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
 end
 
-function Player:draw(offsetX, offsetY)
+function Player:draw(offsetX, offsetY, screenWidth, screenHeight)
 	love.graphics.draw(self.imgTile, self.quadTile, self.posX + offsetX, self.posY + offsetY)
 	
 	love.graphics.print(self.testoutput, 400, 300)
+	
+	local stat = "Meat: " .. self.meat .. "/" .. self.meatTarget
+	stat = stat .. "    Salt: " .. self.salt .. "/" .. self.saltTarget
+	stat = stat .. "    Spice: " .. self.spice .. "/" .. self.spiceTarget
+	stat = stat .. "    Onion: " .. self.onion .. "/" .. self.onionTarget
+	love.graphics.print(stat, 50, screenHeight - 200)
 end
 
 function Player:keyreleased(key)

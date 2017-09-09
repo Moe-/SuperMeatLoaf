@@ -4,7 +4,7 @@ require("world")
 gWorld = nil
 
 function init()
-	gWorld = World:new(800,600)	
+	gWorld = World:new(1920,1080, 1)	
 	math.randomseed(4)
 end
 
