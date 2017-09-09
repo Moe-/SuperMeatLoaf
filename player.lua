@@ -31,11 +31,21 @@ function Player:__init(posX, posY, meat, salt, onion, spice)
 	
 	self.testoutput = ""
 	self.touchFloor = false
+	self.inPan = false
 	
 	self:loadGfx()
 end
 
-function Player:update(dt, level, width, height, broccoli, items)
+function Player:update(dt, level, width, height, broccoli, items, pan, gameState)
+	if self.inPan then
+		self.posX, self.posY = pan:getPos()
+		return "won"
+	end
+	
+	if gameState ~= "alive" then
+		return gameState
+	end
+	
 	--if self.speedY ~= 0 or self.speedY > gPlayerSpeed then
 		self.speedY = self.speedY + 2 * dt * gPlayerSpeed
 	--end
@@ -96,12 +106,19 @@ function Player:update(dt, level, width, height, broccoli, items)
 	local brocX, brocY = broccoli:getPos()
 	local distance = getDistance(self.posX, self.posY, brocX, brocY)
 	if distance < gTileSize / 2 then
-		self.testoutput = "DEAD " .. distance
-	else
-		self.testoutput = "ALIVE " .. distance
+		return "dead"
 	end
 	
+	local panX, panY = pan:getPos()
+	distance = getDistance(self.posX, self.posY, panX, panY)
+	if distance < gTileSize / 2 then
+		self.inPan = true
+		pan:setPlayerInside()
+	end
+	
+	
 	self.nextJump = self.nextJump - dt
+	return "alive"
 end
 	
 function Player:loadGfx()	
@@ -142,4 +159,8 @@ function Player:keypressed(key, scancode, isrepeat)
 --	for i, v in pairs(self.players) do
 --		v:keypressed(key, scancode, isrepeat)
 --	end
+end
+
+function Player:getResult()
+	return self.salt / self.saltTarget, self.spice / self.spiceTarget, self.onion / self.onionTarget, self.meat / self.meatTarget
 end

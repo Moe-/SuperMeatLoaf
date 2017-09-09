@@ -18,8 +18,10 @@ function Broccoli:__init(posX, posY)
 end
 
 function Broccoli:update(dt)
-	self.posX = self.nextX[1]
-	self.posY = self.nextY[1]
+	if #self.nextX > 1 then
+		self.posX = self.nextX[1]
+		self.posY = self.nextY[1]
+	end
 	table.remove(self.nextX, 1)
 	table.remove(self.nextY, 1)
 end

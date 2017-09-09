@@ -1,6 +1,8 @@
 require("tileloader")
 require("broccoli")
 require("item")
+require("pan")
+require("oven")
 require("player")
 
 
@@ -60,14 +62,24 @@ function World:__init(width, height, level)
 			elseif id == 12 then
 				table.insert(self.items, Item:new(x * gTileSize, y * gTileSize, "onion")) 
 				self.level[y * self.width + x + 1] = 0
+			elseif id == 3 then
+				self.pan = Pan:new(x * gTileSize, y * gTileSize) 
+				self.level[y * self.width + x + 1] = 0
+			elseif id == 17 then
+				self.oven = Oven:new(x * gTileSize, y * gTileSize)
+				self.level[y * self.width + x + 1] = 0
 			end
 		end
 	end
+	
+	self.gameState = "alive"
 end
 
 function World:update(dt)
-	self.player:update(dt, self.level, self.width, self.height, self.broccoli, self.items)
+	self.gameState = self.player:update(dt, self.level, self.width, self.height, self.broccoli, self.items, self.pan, self.gameState)
+		
 	self.broccoli:update(dt)
+	self.pan:update(dt, self.oven)
 end
 
 function World:loadGfx()	
@@ -97,9 +109,32 @@ function World:draw()
 	
 	self.player:draw(offsetX, offsetY, self.screenWidth, self.screenHeight)
 	self.broccoli:draw(offsetX, offsetY)
+	self.pan:draw(offsetX, offsetY)
+	self.oven:draw(offsetX, offsetY)
 	
 	for i, v in pairs(self.items) do
 		v:draw(offsetX, offsetY)
+	end
+	
+	if self.gameState == "dead" then
+		love.graphics.setColor(255, 0, 0, 255)
+    love.graphics.print("You have lost the game", self.screenWidth/3, 250, 0, 2, 2)
+	elseif self.gameState == "won" then
+		love.graphics.setColor(0, 0, 255, 255)
+    love.graphics.print("You have won the game", self.screenWidth/3, 250, 0, 2, 2)
+		local salt, spice, onion, meat = self.player:getResult()
+		salt = math.abs(salt - 1)
+		spice = math.abs(spice - 1)
+		onion = math.abs(onion - 1)
+		meat = math.abs(meat - 1)
+		local sum = salt + spice + onion + meat
+		if sum < 0.2 then
+			love.graphics.setColor(0, 255, 255, 255)
+			love.graphics.print("and you made good recipe!", self.screenWidth/3, 350, 0, 2, 2)
+		else
+			love.graphics.setColor(255, 0, 0, 255)
+			love.graphics.print("but your recipe sucks!", self.screenWidth/3, 350, 0, 2, 2)
+		end
 	end
 --	love.graphics.draw(self.background)
 end
