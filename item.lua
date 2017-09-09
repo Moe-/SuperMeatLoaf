@@ -12,10 +12,7 @@ function Item:__init(posX, posY, itemType)
 end
 
 function Item:update(dt)
-	self.posX = self.nextX[1]
-	self.posY = self.nextY[1]
-	table.remove(self.nextX, 1)
-	table.remove(self.nextY, 1)
+
 end
 	
 function Item:loadGfx()	
