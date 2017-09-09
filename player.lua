@@ -41,6 +41,7 @@ end
 function Player:update(dt, level, width, height, broccoli, items, pan, gameState)
 	if self.inPan then
 		self.posX, self.posY = pan:getPos()
+		self.posX = self.posX + gTileSize/2
 		return "won"
 	end
 	
@@ -55,7 +56,7 @@ function Player:update(dt, level, width, height, broccoli, items, pan, gameState
 	elseif self.speedY > 0 then
 		factor = 4
 	elseif self.speedY > -gPlayerSpeed then
-		factor = 2
+		factor = 1.5
 	else
 		factor = 1
 	end
