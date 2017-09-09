@@ -33,6 +33,8 @@ function Player:__init(posX, posY, meat, salt, onion, spice)
 	self.touchFloor = false
 	self.inPan = false
 	
+	self.animFrame = 0
+	
 	self:loadGfx()
 end
 
@@ -122,12 +124,25 @@ function Player:update(dt, level, width, height, broccoli, items, pan, gameState
 end
 	
 function Player:loadGfx()	
-	self.imgTile = love.graphics.newImage("gfx/tilemap.png")
-	self.quadTile = love.graphics.newQuad(0 * gTileSize, 0 * gTileSize, gTileSize, gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
+	self.imgTile = love.graphics.newImage("gfx/spr_sml.png")
+	--self.quadTile = love.graphics.newQuad(0 * gTileSize, 0 * gTileSize, 2 * gTileSize, 2 * gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
 end
 
 function Player:draw(offsetX, offsetY, screenWidth, screenHeight)
-	love.graphics.draw(self.imgTile, self.quadTile, self.posX + offsetX, self.posY + offsetY)
+	local yGfx = 0
+	if self.speedY == 0 then
+		yGfx = 0
+	elseif self.speedY > 0 then
+		yGfx = 4
+	elseif self.speedY < 0 then
+		yGfx = 2
+	end
+	if self.speedX < 0 then
+		yGfx = yGfx + 1
+	end
+	local scale = (self.meat + self.meatTarget) / (2 * self.meatTarget)
+	local quadTile = love.graphics.newQuad(self.animFrame * 2 * gTileSize, yGfx * 2 * gTileSize, 2 * gTileSize, 2 * gTileSize, self.imgTile:getWidth(), self.imgTile:getHeight())
+	love.graphics.draw(self.imgTile, quadTile, self.posX + offsetX, self.posY + offsetY, 0, scale, scale)
 	
 	love.graphics.print(self.testoutput, 400, 300)
 	
@@ -136,6 +151,8 @@ function Player:draw(offsetX, offsetY, screenWidth, screenHeight)
 	stat = stat .. "    Spice: " .. self.spice .. "/" .. self.spiceTarget
 	stat = stat .. "    Onion: " .. self.onion .. "/" .. self.onionTarget
 	love.graphics.print(stat, 50, screenHeight - 200)
+	
+	self.animFrame = (self.animFrame + 1) % 30
 end
 
 function Player:keyreleased(key)
